@@ -2103,6 +2103,7 @@ static int cr_dump_finish(int ret)
 	return post_dump_ret ?: (ret != 0);
 }
 
+// dump所有进程开始的入口
 int cr_dump_tasks(pid_t pid)
 {
 	InventoryEntry he = INVENTORY_ENTRY__INIT;

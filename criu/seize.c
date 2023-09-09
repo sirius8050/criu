@@ -961,6 +961,7 @@ static int cgroup_version(void)
 	return -1;
 }
 
+// 收集进程树，并存入item
 int collect_pstree(void)
 {
 	pid_t pid = root_item->pid->real;
