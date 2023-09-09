@@ -615,7 +615,7 @@ static int collect_children(struct pstree_item *item)
 
 	// TODO:修改进程树收集，不再进行DSF查找，仅仅收集一个根节点
 	nr_children = 0;
-	printf("Not collect children process!")
+	printf("Not collect children process!");
 	for (i = 0; i < nr_children; i++) {
 		struct pstree_item *c;
 		struct proc_status_creds creds;
