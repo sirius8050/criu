@@ -611,8 +611,11 @@ static int collect_children(struct pstree_item *item)
 	ret = parse_children(item->pid->real, &ch, &nr_children);
 	if (ret < 0)
 		return ret;
-
 	nr_inprogress = 0;
+
+	// TODO:修改进程树收集，不再进行DSF查找，仅仅收集一个根节点
+	nr_children = 0;
+	printf("Not collect children process!")
 	for (i = 0; i < nr_children; i++) {
 		struct pstree_item *c;
 		struct proc_status_creds creds;
@@ -911,6 +914,7 @@ static int collect_loop(struct pstree_item *item, int (*collect)(struct pstree_i
 	return (nr_inprogress == 0) ? 0 : -1;
 }
 
+// 收集进程，组建进程树
 static int collect_task(struct pstree_item *item)
 {
 	int ret;
@@ -961,6 +965,7 @@ static int cgroup_version(void)
 	return -1;
 }
 
+// 收集进程树，并存入item
 int collect_pstree(void)
 {
 	pid_t pid = root_item->pid->real;
