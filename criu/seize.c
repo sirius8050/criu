@@ -613,8 +613,11 @@ static int collect_children(struct pstree_item *item)
 		return ret;
 	nr_inprogress = 0;
 
-	// TODO:修改进程树收集，不再进行DSF查找，仅仅收集一个根节点
+	// TODO-Done: 修改进程树收集，不再进行DSF查找，仅仅收集一个进程，也就是这个pid，不去收集这个pid的子进程。
+	// 实现原理：nr_children是统计了子进程的数量，在下面的循环中对每个子进程进行处理，
+	// 这里直接修改子进程数量为0，那么就不会进入循环来处理起子进程。
 	nr_children = 0;
+
 	printf("Not collect children process!");
 	for (i = 0; i < nr_children; i++) {
 		struct pstree_item *c;
