@@ -611,8 +611,8 @@ static int collect_children(struct pstree_item *item)
 	ret = parse_children(item->pid->real, &ch, &nr_children);
 	if (ret < 0)
 		return ret;
-
 	nr_inprogress = 0;
+
 	for (i = 0; i < nr_children; i++) {
 		struct pstree_item *c;
 		struct proc_status_creds creds;
@@ -911,6 +911,7 @@ static int collect_loop(struct pstree_item *item, int (*collect)(struct pstree_i
 	return (nr_inprogress == 0) ? 0 : -1;
 }
 
+// 收集进程，组建进程树
 static int collect_task(struct pstree_item *item)
 {
 	int ret;

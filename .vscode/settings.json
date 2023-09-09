@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "apparmor.h": "c",
+        "string.h": "c"
+    }
+}

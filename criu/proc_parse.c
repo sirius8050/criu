@@ -2804,6 +2804,7 @@ int parse_children(pid_t pid, pid_t **_c, int *_n)
 				goto err_close;
 			}
 
+			// 动态扩容数组ch，并且保存数组中原来的数据？
 			tmp = xrealloc(ch, (nr + 1) * sizeof(pid_t));
 			if (!tmp)
 				goto err_close;
