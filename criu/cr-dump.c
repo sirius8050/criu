@@ -2175,7 +2175,6 @@ int cr_dump_tasks(pid_t pid)
 	 * thus ensuring that they don't modify anything we collect
 	 * afterwards.
 	 */
-
 	if (collect_pstree())
 		goto err;
 
