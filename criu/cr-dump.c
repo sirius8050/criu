@@ -2176,7 +2176,8 @@ int cr_dump_tasks(pid_t pid)
 	 * thus ensuring that they don't modify anything we collect
 	 * afterwards.
 	 */
-
+	// 采用DFS收集以目标pid为根节点的一颗进程树。当只想dump某个进程而不是一棵树，
+	// 则只需要修改该函数即可。看代码的dumpone分支
 	if (collect_pstree())
 		goto err;
 
