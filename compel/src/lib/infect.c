@@ -378,7 +378,7 @@ int compel_resume_task_sig(pid_t pid, int orig_st, int st, int stop_signo)
 	int ret = 0;
 
 	pr_debug("\tUnseizing %d into %d\n", pid, st);
-
+	// 如果是TASK_DEAD状态，那么就杀死进程。
 	if (st == COMPEL_TASK_DEAD) {
 		kill(pid, SIGKILL);
 		return 0;

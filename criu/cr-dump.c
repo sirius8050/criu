@@ -2082,6 +2082,7 @@ static int cr_dump_finish(int ret)
 
 	if (arch_set_thread_regs(root_item, true) < 0)
 		return -1;
+	// 当dump的信息基本已经写入文件之后，需要调整pstree的状态，如果dump成功，则需要杀死所有进程。若失败则恢复进程运行。
 	pstree_switch_state(root_item, (ret || post_dump_ret) ? TASK_ALIVE : opts.final_state);
 	timing_stop(TIME_FROZEN);
 	free_pstree(root_item);
@@ -2168,6 +2169,7 @@ int cr_dump_tasks(pid_t pid)
 	if (connect_to_page_server_to_send() < 0)
 		goto err;
 
+	/*超时检测，当dump过程中时间过长，超过超时时间则暂停dump，恢复进程执行。*/
 	if (setup_alarm_handler())
 		goto err;
 
@@ -2176,8 +2178,10 @@ int cr_dump_tasks(pid_t pid)
 	 * thus ensuring that they don't modify anything we collect
 	 * afterwards.
 	 */
-	// 采用DFS收集以目标pid为根节点的一颗进程树。当只想dump某个进程而不是一棵树，
-	// 则只需要修改该函数即可。看代码的dumpone分支
+	/*
+	采用DFS收集以目标pid为根节点的一颗进程树。当只想dump某个进程而不是一棵树，则只需要修改该函数即可。看代码的dumpone分支.
+	从此处开始，进程开始暂停执行！！
+	*/ 
 	if (collect_pstree())
 		goto err;
 
