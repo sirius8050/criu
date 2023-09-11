@@ -1,2 +1,6 @@
 .vscode/c_cpp_properties.json
 .gitignore
+.github
+.idea
+.vscode
+.circleci
