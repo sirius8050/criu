@@ -43,7 +43,7 @@ enum { SCRIPTS_NONE, SCRIPTS_SHELL, SCRIPTS_RPC };
 
 static int scripts_mode = SCRIPTS_NONE;
 static LIST_HEAD(scripts);
-
+//shell里运行脚本
 static int run_shell_scripts(const char *action)
 {
 	int retval = 0;

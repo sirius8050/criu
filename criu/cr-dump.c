@@ -864,6 +864,7 @@ static int collect_pstree_ids_predump(void)
 	return 0;
 }
 
+//为每个item获取id
 int collect_pstree_ids(void)
 {
 	struct pstree_item *item;
@@ -1529,6 +1530,7 @@ err_cure:
 	goto err_free;
 }
 
+//dump单个task
 static int dump_one_task(struct pstree_item *item, InventoryEntry *parent_ie)
 {
 	pid_t pid = item->pid->real;
@@ -1547,6 +1549,7 @@ static int dump_one_task(struct pstree_item *item, InventoryEntry *parent_ie)
 	pr_info("Dumping task (pid: %d comm: %s)\n", pid, __task_comm_info(pid));
 	pr_info("========================================\n");
 
+	//该函数不dump僵尸进程，返回
 	if (item->pid->state == TASK_DEAD)
 		/*
 		 * zombies are dumped separately in dump_zombies()
@@ -2106,9 +2109,10 @@ static int cr_dump_finish(int ret)
 // dump所有进程开始的入口
 int cr_dump_tasks(pid_t pid)
 {
+	//TODO:InventoryEntry是什么
 	InventoryEntry he = INVENTORY_ENTRY__INIT;
 	InventoryEntry *parent_ie = NULL;
-	struct pstree_item *item;
+	struct pstree_item *item;//root item?
 	int pre_dump_ret = 0;
 	int ret = -1;
 
@@ -2128,7 +2132,7 @@ int cr_dump_tasks(pid_t pid)
 		goto err;
 	root_item->pid->real = pid;
 
-	pre_dump_ret = run_scripts(ACT_PRE_DUMP);
+	pre_dump_ret = run_scripts(ACT_PRE_DUMP);//pre dump?
 	if (pre_dump_ret != 0) {
 		pr_err("Pre dump script failed with %d!\n", pre_dump_ret);
 		goto err;
@@ -2139,6 +2143,7 @@ int cr_dump_tasks(pid_t pid)
 	if (cr_plugin_init(CR_PLUGIN_STAGE__DUMP))
 		goto err;
 
+	//linux security module
 	if (lsm_check_opts())
 		goto err;
 
@@ -2156,7 +2161,7 @@ int cr_dump_tasks(pid_t pid)
 
 	if (parse_cg_info())
 		goto err;
-
+	//准备保存img的容器
 	if (prepare_inventory(&he))
 		goto err;
 
@@ -2208,6 +2213,7 @@ int cr_dump_tasks(pid_t pid)
 	if (collect_and_suspend_lsm() < 0)
 		goto err;
 
+	//依次dump每个task
 	for_each_pstree_item(item) {
 		if (dump_one_task(item, parent_ie))
 			goto err;

@@ -197,6 +197,7 @@ void cr_plugin_fini(int stage, int ret)
 	}
 }
 
+//初始化插件
 int cr_plugin_init(int stage)
 {
 	int exit_code = -1;

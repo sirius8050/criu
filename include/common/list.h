@@ -12,6 +12,7 @@
 #define LIST_POISON1	     ((void *)0x00100100 + POISON_POINTER_DELTA)
 #define LIST_POISON2	     ((void *)0x00200200 + POISON_POINTER_DELTA)
 
+//双向链表，但是怎么由list_head找到包含自己的对象？
 struct list_head {
 	struct list_head *prev, *next;
 };
@@ -21,7 +22,7 @@ struct list_head {
 		&(name), &(name) \
 	}
 #define LIST_HEAD(name) struct list_head name = LIST_HEAD_INIT(name)
-
+//初始化链表头部
 static inline void INIT_LIST_HEAD(struct list_head *list)
 {
 	list->next = list;
@@ -106,6 +107,7 @@ static inline int list_is_first(const struct list_head *list, const struct list_
 	return list->prev == head;
 }
 
+//初始化list
 static inline int list_empty(const struct list_head *head)
 {
 	return head->next == head;

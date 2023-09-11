@@ -515,11 +515,11 @@ static int freeze_processes(void)
 
 	pr_debug("freezing processes: %lu attempts with %lu ms steps\n", nr_attempts, step_ms);
 
-	fd = freezer_open();
+	fd = freezer_open();//
 	if (fd < 0)
 		return -1;
 
-	state = get_freezer_state(fd);
+	state = get_freezer_state(fd);//检查freezer
 	if (state == FREEZER_ERROR) {
 		close(fd);
 		return -1;

@@ -153,6 +153,7 @@ int iptables_unlock_connection_info(struct inet_sk_info *si)
 	return ret;
 }
 
+//创建了一个nftable，并写入相关规则
 int nftables_init_connection_lock(void)
 {
 #if defined(CONFIG_HAS_NFTABLES_LIB_API_0) || defined(CONFIG_HAS_NFTABLES_LIB_API_1)

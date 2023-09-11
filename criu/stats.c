@@ -212,6 +212,8 @@ void write_stats(int what)
 		display_stats(what, &stats);
 }
 
+
+//初始化dump或者restore时的状态
 int init_stats(int what)
 {
 	if (what == DUMP_STATS) {

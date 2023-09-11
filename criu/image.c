@@ -157,7 +157,7 @@ int inventory_save_uptime(InventoryEntry *he)
  * but we don't have (can't access, etc) parent inventory => can't detect
  * pid-reuse => fail.
  */
-
+//从前一次的dump迭代获取img容器
 InventoryEntry *get_parent_inventory(void)
 {
 	struct cr_img *img;

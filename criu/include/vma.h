@@ -20,7 +20,7 @@ struct vm_area_list {
 	unsigned long nr_priv_pages_longest;   /* nr of pages in longest private VMA */
 	unsigned long nr_shared_pages_longest; /* nr of pages in longest shared VMA */
 };
-
+//初始化vma list
 static inline void vm_area_list_init(struct vm_area_list *vml)
 {
 	memset(vml, 0, sizeof(*vml));
