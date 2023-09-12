@@ -203,6 +203,7 @@ InventoryEntry *get_parent_inventory(void)
 	return ie;
 }
 
+//准备保存img的容器
 int prepare_inventory(InventoryEntry *he)
 {
 	struct pid pid;

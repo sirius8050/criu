@@ -2161,7 +2161,7 @@ int cr_dump_tasks(pid_t pid)
 
 	if (parse_cg_info())
 		goto err;
-	//准备保存img的容器
+	
 	if (prepare_inventory(&he))
 		goto err;
 

@@ -603,6 +603,7 @@ static inline bool child_collected(struct pstree_item *i, pid_t pid)
 }
 
 static int collect_task(struct pstree_item *item);
+//DFS收集子进程
 static int collect_children(struct pstree_item *item)
 {
 	pid_t *ch;
@@ -766,6 +767,7 @@ static pid_t item_ppid(const struct pstree_item *item)
 	return item ? item->pid->real : -1;
 }
 
+//检测线程是否已被收集
 static inline bool thread_collected(struct pstree_item *i, pid_t tid)
 {
 	int t;
@@ -779,7 +781,7 @@ static inline bool thread_collected(struct pstree_item *i, pid_t tid)
 
 	return false;
 }
-
+//收集线程
 static int collect_threads(struct pstree_item *item)
 {
 	struct seccomp_entry *task_seccomp_entry;
@@ -807,7 +809,7 @@ static int collect_threads(struct pstree_item *item)
 
 	item->threads = tmp;
 
-	if (item->nr_threads == 0) {
+	if (item->nr_threads == 0) {//初始化
 		item->threads[0].real = item->pid->real;
 		item->nr_threads = 1;
 		item->threads[0].item = NULL;
@@ -876,10 +878,10 @@ err:
 	xfree(threads);
 	return -1;
 }
-
+//收集孩子或线程
 static int collect_loop(struct pstree_item *item, int (*collect)(struct pstree_item *))
 {
-	int attempts = NR_ATTEMPTS, nr_inprogress = 1;
+	int attempts = NR_ATTEMPTS, nr_inprogress = 1;//尝试五次
 
 	if (opts.freeze_cgroup)
 		attempts = 1;
@@ -893,7 +895,7 @@ static int collect_loop(struct pstree_item *item, int (*collect)(struct pstree_i
 	 * fail to seize the item if new tasks/threads still
 	 * appear.
 	 */
-
+	//如果找到的项目不为零并且尝试次数还没结束
 	while (nr_inprogress > 0 && attempts >= 0) {
 		attempts--;
 		nr_inprogress = collect(item);

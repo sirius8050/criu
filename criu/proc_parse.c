@@ -2441,6 +2441,7 @@ err:
 	goto out;
 }
 
+//解包线程获取线程数量和tid
 int parse_threads(int pid, struct pid **_t, int *_n)
 {
 	struct dirent *de;
@@ -2762,7 +2763,7 @@ int aufs_parse(struct mount_info *new)
 
 	return ret;
 }
-
+//解析子进程
 int parse_children(pid_t pid, pid_t **_c, int *_n)
 {
 	pid_t *ch = NULL;
