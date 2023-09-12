@@ -1385,6 +1385,7 @@ static int prepare_uffds(int listen, int epollfd)
 			goto close_uffd;
 		if (lpi == NULL)
 			continue;
+		// epoll_add_rfd函数用于添加epool事件，底层是调用了sys/epoll的epoll_ctl操作。
 		if (epoll_add_rfd(epollfd, &lpi->lpfd))
 			goto close_uffd;
 	}
@@ -1453,7 +1454,7 @@ int cr_lazy_pages(bool daemon)
 	epollfd = epoll_prepare(nr_fds, &events);
 	if (epollfd < 0)
 		return -1;
-
+	
 	if (prepare_uffds(lazy_sk, epollfd)) {
 		xfree(events);
 		return -1;
