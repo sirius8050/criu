@@ -1336,6 +1336,7 @@ static int set_next_pid(void *arg)
 	return 0;
 }
 
+//创建对应pid的新进程
 static inline int fork_with_pid(struct pstree_item *item)
 {
 	struct cr_clone_arg ca;
@@ -1460,7 +1461,7 @@ static inline int fork_with_pid(struct pstree_item *item)
 			}
 		}
 	}
-
+	//采用clone来创建新的进程
 	if (kdat.has_clone3_set_tid) {
 		ret = clone3_with_pid_noasan(restore_task_with_children, &ca,
 					     (ca.clone_flags & ~(CLONE_NEWNET | CLONE_NEWCGROUP | CLONE_NEWTIME)),
@@ -2234,6 +2235,7 @@ static void reap_zombies(void)
 	}
 }
 
+//恢复根进程
 static int restore_root_task(struct pstree_item *init)
 {
 	int ret, fd, mnt_ns_fd = -1;
@@ -2590,6 +2592,7 @@ int prepare_dummy_task_state(struct pstree_item *pi)
 	return 0;
 }
 
+//restore任务的入口
 int cr_restore_tasks(void)
 {
 	int ret = -1;
