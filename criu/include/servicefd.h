@@ -9,6 +9,7 @@
 
 #include "criu-log.h"
 
+//服务类型，注册服务可以在这里注册
 enum sfd_type {
 	SERVICE_FD_MIN,
 

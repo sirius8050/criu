@@ -20,6 +20,8 @@
 #undef LOG_PREFIX
 #define LOG_PREFIX "sfd: "
 
+//本文件主要对servicefd进行操作处理
+
 /* Max potentially possible fd to be open by criu process */
 int service_fd_rlim_cur;
 
@@ -64,6 +66,7 @@ const char *sfd_type_name(enum sfd_type type)
 	return "UNKNOWN";
 }
 
+//初始化，获取fd数量上限
 int init_service_fd(void)
 {
 	struct rlimit64 rlimit;
@@ -96,11 +99,13 @@ int init_service_fd(void)
 	return 0;
 }
 
+//id转成fd
 static int __get_service_fd(enum sfd_type type, int service_fd_id)
 {
 	return service_fd_base - type - SERVICE_FD_MAX * service_fd_id;
 }
 
+//获取服务fd
 int get_service_fd(enum sfd_type type)
 {
 	BUG_ON((int)type <= SERVICE_FD_MIN || (int)type >= SERVICE_FD_MAX);
@@ -113,7 +118,7 @@ int get_service_fd(enum sfd_type type)
 
 	return __get_service_fd(type, service_fd_id);
 }
-
+//检测是不是servicefd
 bool is_any_service_fd(int fd)
 {
 	int sfd_min_fd = __get_service_fd(SERVICE_FD_MAX, service_fd_id);
@@ -127,7 +132,7 @@ bool is_any_service_fd(int fd)
 
 	return false;
 }
-
+//检测fd的type
 bool is_service_fd(int fd, enum sfd_type type)
 {
 	return fd == get_service_fd(type);

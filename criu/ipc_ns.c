@@ -37,6 +37,7 @@
 #define MSG_COPY 040000
 #endif
 
+//打印信息
 static void pr_ipc_desc_entry(const IpcDescEntry *desc)
 {
 	pr_info("id: %-10d key: %#08x uid: %-10d gid: %-10d "
@@ -44,6 +45,7 @@ static void pr_ipc_desc_entry(const IpcDescEntry *desc)
 		desc->id, desc->key, desc->uid, desc->gid, desc->cuid, desc->cgid, desc->mode);
 }
 
+//填充ipc细节信息（id、uid、gid之类）
 static void fill_ipc_desc(int id, IpcDescEntry *desc, const struct ipc_perm *ipcp)
 {
 	desc->id = id;
@@ -70,6 +72,7 @@ static void pr_info_ipc_sem_entry(const IpcSemEntry *sem)
 	pr_info("nsems: %-10d\n", sem->nsems);
 }
 
+//dump ipc信号量集合（提取信息写入img）
 static int dump_ipc_sem_set(struct cr_img *img, const IpcSemEntry *sem)
 {
 	size_t rounded;
@@ -93,7 +96,7 @@ static int dump_ipc_sem_set(struct cr_img *img, const IpcSemEntry *sem)
 	pr_info_ipc_sem_array(sem->nsems, values);
 
 	memzero((void *)values + size, rounded - size);
-	ret = write_img_buf(img, values, rounded);
+	ret = write_img_buf(img, values, rounded);//写入img
 	if (ret < 0) {
 		pr_err("Failed to write IPC message data\n");
 		goto out;
@@ -123,6 +126,7 @@ static int dump_ipc_sem_desc(struct cr_img *img, int id, const struct semid_ds *
 	return dump_ipc_sem_set(img, &sem);
 }
 
+//信号量ipc的dump入口
 static int dump_ipc_sem(struct cr_img *img)
 {
 	int i, maxid;
@@ -169,6 +173,7 @@ static void pr_info_ipc_msg_entry(const IpcMsgEntry *msg)
 	pr_info("qbytes: %-10d qnum: %-10d\n", msg->qbytes, msg->qnum);
 }
 
+//dump基于消息队列的ipc的消息
 static int dump_ipc_msg_queue_messages(struct cr_img *img, const IpcMsgEntry *msq, unsigned int msg_nr)
 {
 	struct msgbuf *message = NULL;
@@ -226,6 +231,7 @@ err:
 	return ret;
 }
 
+//dump
 static int dump_ipc_msg_queue(struct cr_img *img, int id, const struct msqid_ds *ds)
 {
 	IpcMsgEntry msg = IPC_MSG_ENTRY__INIT;
@@ -246,7 +252,7 @@ static int dump_ipc_msg_queue(struct cr_img *img, int id, const struct msqid_ds 
 	}
 	return dump_ipc_msg_queue_messages(img, &msg, ds->msg_qnum);
 }
-
+//dump基于消息的ipc的入口
 static int dump_ipc_msg(struct cr_img *img)
 {
 	int i, maxid;
@@ -282,7 +288,7 @@ static int dump_ipc_msg(struct cr_img *img)
 	return info.msgpool;
 }
 
-static void pr_info_ipc_shm(const IpcShmEntry *shm)
+static void pr_info_ipc_sm(const IpcShmEntry *shm)
 {
 	pr_ipc_desc_entry(shm->desc);
 	pr_info("size: %-10" PRIu64 "\n", shm->size);
@@ -421,6 +427,7 @@ static int dump_ipc_shm_seg(struct cr_img *img, int id, const struct shmid_ds *d
 	return dump_ipc_shm_pages(&shm);
 }
 
+//dump基于共享内存的ipc
 static int dump_ipc_shm(struct cr_img *img)
 {
 	int i, maxid, slot;
@@ -499,7 +506,7 @@ err:
 	xfree(var.sem_ctls);
 	return ret;
 }
-
+//ipc dump的入口
 static int dump_ipc_data(const struct cr_imgset *imgset)
 {
 	int ret;
@@ -964,7 +971,7 @@ static int prepare_ipc_var(int pid)
 
 	return 0;
 }
-
+//准备ipc namespace（基于变量、共享内存、消息、信号量）
 int prepare_ipc_ns(int pid)
 {
 	int ret;
