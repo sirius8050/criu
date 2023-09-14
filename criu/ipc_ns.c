@@ -288,7 +288,7 @@ static int dump_ipc_msg(struct cr_img *img)
 	return info.msgpool;
 }
 
-static void pr_info_ipc_sm(const IpcShmEntry *shm)
+static void pr_info_ipc_shm(const IpcShmEntry *shm)
 {
 	pr_ipc_desc_entry(shm->desc);
 	pr_info("size: %-10" PRIu64 "\n", shm->size);
