@@ -2206,9 +2206,19 @@ int cr_dump_tasks(pid_t pid)
 	if (collect_and_suspend_lsm() < 0)
 		goto err;
 
+	// 继续所有进程的执行
+	for_each_pstree_item(item){
+		ptrace(PTRACE_CONT, item->pid->real, NULL, NULL);
+	}
+
 	for_each_pstree_item(item) {
+		// dump哪个进程就先暂停哪个进程的执行
+		ptrace(PTRACE_INTERRUPT, item->pid->real, NULL, NULL);
 		if (dump_one_task(item, parent_ie))
 			goto err;
+		
+		// TODO：这里需要加上在对端机器上进行进程的逐个恢复。
+		
 	}
 
 	if (parent_ie) {

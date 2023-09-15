@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.json": "jsonc",
+        "locale": "c",
+        "string": "c"
+    }
+}
