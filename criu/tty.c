@@ -352,6 +352,7 @@ static bool tty_is_master(struct tty_info *info);
 
 int tty_init_restore(void)
 {
+	// shmalloc是CRIU自己实现的一个内存分配器。自己管理申请到的内存地址。
 	tty_mutex = shmalloc(sizeof(*tty_mutex));
 	if (!tty_mutex) {
 		pr_err("Can't create ptmx index mutex\n");

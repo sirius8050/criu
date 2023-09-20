@@ -2,6 +2,17 @@
     "files.associations": {
         "*.json": "jsonc",
         "locale": "c",
-        "string": "c"
+        "string": "c",
+        "xmalloc.h": "c",
+        "pstree.h": "c",
+        "image.h": "c",
+        "img-streamer.h": "c",
+        "namespaces.h": "c",
+        "crtools.h": "c",
+        "sched.h": "c",
+        "types.h": "c",
+        "rseq.h": "c",
+        "clone-noasan.h": "c",
+        "cr_options.h": "c"
     }
 }

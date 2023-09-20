@@ -10,10 +10,33 @@
                 "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks"
             ],
             "compilerPath": "/usr/bin/clang",
-            "cStandard": "c17",
+            "cStandard": "c99",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "macos-gcc-x86",
+            "configurationProvider": "ms-vscode.makefile-tools"
+        },
+        {
+            "name": "Linux",
+            "includePath": [
+                "/Users/zhuxianzhi/Desktop/OpenSourceProject/criu/**"
+            ],
+            "defines": [],
+            "macFrameworkPath": [
+                "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks"
+            ],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c99",
             "cppStandard": "c++17",
             "intelliSenseMode": "macos-clang-arm64",
-            "configurationProvider": "ms-vscode.makefile-tools"
+            "compilerPathInCppPropertiesJson": "/usr/bin/clang",
+            "mergeConfigurations": false,
+            "browse": {
+                "path": [
+                    "/Users/zhuxianzhi/Desktop/OpenSourceProject/criu/**",
+                    "${workspaceFolder}"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            }
         }
     ],
     "version": 4

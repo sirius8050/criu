@@ -22,6 +22,7 @@
 #else
 #include <unistd.h>
 #include <sys/syscall.h>
+// futex: 一种高级的用户态与内核态协作的锁，当无冲突时直接进入临界区，当冲突时才使用Linux系统调用进入内核态
 static inline long sys_futex(uint32_t *addr1, int op, uint32_t val1, struct timespec *timeout, uint32_t *addr2,
 			     uint32_t val3)
 {

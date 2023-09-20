@@ -1006,6 +1006,7 @@ int prepare_pstree(void)
 		close(fd);
 		if (ret > 0) {
 			buf[ret] = 0;
+			// 提取数字
 			kpid_max = strtoul(buf, NULL, 10);
 			pr_debug("kernel pid_max=%d\n", kpid_max);
 		}

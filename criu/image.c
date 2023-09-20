@@ -20,7 +20,7 @@
 #include "img-streamer.h"
 #include "namespaces.h"
 
-bool ns_per_id = false;
+bool ns_per_id = false;s
 bool img_common_magic = true;
 TaskKobjIdsEntry *root_ids;
 u32 root_cg_set;
@@ -31,7 +31,7 @@ int check_img_inventory(bool restore)
 	int ret = -1;
 	struct cr_img *img;
 	InventoryEntry *he;
-
+	// 从文件夹读取img，返回的是img数据结构，里面包含fd等信息
 	img = open_image(CR_FD_INVENTORY, O_RSTR);
 	if (!img)
 		return -1;

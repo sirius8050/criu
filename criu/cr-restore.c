@@ -1342,6 +1342,7 @@ static inline int fork_with_pid(struct pstree_item *item)
 	struct ns_id *pid_ns = NULL;
 	bool external_pidns = false;
 	int ret = -1;
+	// vpid为src机器上的被dump进程的pid，应该是想把这个pid恢复到dest上作为最终结果。
 	pid_t pid = vpid(item);
 
 	if (item->pid->state != TASK_HELPER) {
@@ -1479,6 +1480,7 @@ static inline int fork_with_pid(struct pstree_item *item)
 		 * move_in_cgroup(), so drop this flag here as well.
 		 */
 		close_pid_proc();
+		// 这一句调试的时候会死
 		ret = clone_noasan(restore_task_with_children,
 				   (ca.clone_flags & ~(CLONE_NEWNET | CLONE_NEWCGROUP | CLONE_NEWTIME)) | SIGCHLD, &ca);
 	}
@@ -1886,7 +1888,7 @@ static int restore_task_with_children(void *_arg)
 		if (populate_root_fd_off())
 			goto err;
 	}
-
+	// 如果使用调试来运行restore，进程会死在这里
 	if (setup_newborn_fds(current))
 		goto err;
 
@@ -1924,6 +1926,7 @@ static int restore_task_with_children(void *_arg)
 
 	restore_pgid();
 
+	// 接下来是一个Barrier，同步pstree中所有的父子进程。为后续的正式装载目标进程做准备
 	if (current->parent == NULL) {
 		/*
 		 * Wait when all tasks passed the CR_STATE_FORKING stage.
@@ -2593,44 +2596,45 @@ int prepare_dummy_task_state(struct pstree_item *pi)
 int cr_restore_tasks(void)
 {
 	int ret = -1;
-
+	// 获得本系统下最大支持的打开的文件描述符个数，并写入全局变量service_fd_rlim_cur
 	if (init_service_fd())
 		return 1;
-
+	// criu的插件初始化，主要包含lib包目录位置读取、
 	if (cr_plugin_init(CR_PLUGIN_STAGE__RESTORE))
 		return -1;
-
+	// 检查镜像是否合法
 	if (check_img_inventory(/* restore = */ true) < 0)
 		goto err;
-
+	// 设置全局状态变量rstats，创建相应数据结构保存状态
 	if (init_stats(RESTORE_STATS))
 		goto err;
-
+	// LSM相关的参数检查，检查宿主机是否支持，用户给定参数是否有效
 	if (lsm_check_opts())
 		goto err;
-
+	// 时间记录，记录TIME_RESTORE的时间
 	timing_start(TIME_RESTORE);
-
+	// 获取CPU基础信息
 	if (cpu_init() < 0)
 		goto err;
-
+	// VDSO: virtual dynamic shared object.
+	// 在proc内找到vsdo相关的map地址等，进行restore
 	if (vdso_init_restore())
 		goto err;
-
+	// tty数据结构初始化，里面包含一块共享的数据结构申请，并且init赋初值
 	if (tty_init_restore())
 		goto err;
-
+	// 验证CPUinfo有效性，有不支持的情况就报错
 	if (opts.cpu_cap & CPU_CAP_IMAGE) {
 		if (cpu_validate_cpuinfo())
 			goto err;
 	}
-
+	// 准备好task_entries数据结构，并进行初始化
 	if (prepare_task_entries() < 0)
 		goto err;
-
+	// 准备好pstree，父子关系已经建立。并且每个item的目标pid也写入了数据结构，包含的线程数等
 	if (prepare_pstree() < 0)
 		goto err;
-
+	
 	if (fdstore_init())
 		goto err;
 
@@ -2639,7 +2643,8 @@ int cr_restore_tasks(void)
 
 	if (crtools_prepare_shared() < 0)
 		goto err;
-
+	
+	// 创建了机器上的cgroup，之后出现错误需要进行fini_cgroup()来清楚cgroup设置
 	if (prepare_cgroup())
 		goto clean_cgroup;
 

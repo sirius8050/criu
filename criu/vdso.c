@@ -560,6 +560,7 @@ int vdso_init_dump(void)
 
 int vdso_init_restore(void)
 {
+	// 
 	if (kdat.vdso_sym.vdso_size == VDSO_BAD_SIZE) {
 		pr_debug("Kdat has empty vdso symtable - probably CONFIG_VDSO is not set\n");
 		return 0;
