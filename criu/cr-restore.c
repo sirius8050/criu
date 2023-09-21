@@ -1584,6 +1584,7 @@ static int criu_signals_setup(void)
 	 *
 	 * TODO: This code should be removed, when a freezer will be added.
 	 */
+	// 创建目标mask，仅仅保留SIGCHLD
 	sigfillset(&blockmask);
 	sigdelset(&blockmask, SIGCHLD);
 
@@ -2254,7 +2255,7 @@ static int restore_root_task(struct pstree_item *init)
 		pr_perror("Unable to open /proc");
 		return -1;
 	}
-
+	
 	ret = install_service_fd(CR_PROC_FD_OFF, fd);
 	if (ret < 0)
 		return -1;
@@ -2265,10 +2266,10 @@ static int restore_root_task(struct pstree_item *init)
 	 * the ns contents dumping/restoring. Need to revisit
 	 * this later.
 	 */
-
+	// 获取loginuid，并修改为目标loginuid，这就是解释为什么user改成了homie！
 	if (prepare_userns_hook())
 		return -1;
-
+	// 准备好所有进程所处的namespace信息，调用run_script创建对应的ns
 	if (prepare_namespace_before_tasks())
 		return -1;
 
@@ -2634,26 +2635,28 @@ int cr_restore_tasks(void)
 	// 准备好pstree，父子关系已经建立。并且每个item的目标pid也写入了数据结构，包含的线程数等
 	if (prepare_pstree() < 0)
 		goto err;
-	
+	// 初始化文件描述符的存储机制，使用socket来存储，后续用这个socket来进行进程间传输fd.
+	// 主要有三个函数：fdstore_init, fdstore_add, fdstore_get.后两个是存取fd函数
 	if (fdstore_init())
 		goto err;
-
+	// opts: cr_options全局变量内包含了用户输入的criu的自定义参数。
+	// 这里是把用户定义的需要继承的fd写入fdstore。
 	if (inherit_fd_move_to_fdstore())
 		goto err;
-
+	// 由大量collect_image函数组成，主要用于收集img中的各种信息（files、memfd、remaps）
 	if (crtools_prepare_shared() < 0)
 		goto err;
 	
 	// 创建了机器上的cgroup，之后出现错误需要进行fini_cgroup()来清楚cgroup设置
 	if (prepare_cgroup())
 		goto clean_cgroup;
-
+	// 为当前的进程设置SIGCHLD信号和处理函数，并阻塞其他的信号
 	if (criu_signals_setup() < 0)
 		goto clean_cgroup;
-
+	// 连接criu --lazy-page创建的socket连接，从中后去
 	if (prepare_lazy_pages_socket() < 0)
 		goto clean_cgroup;
-
+	// 接下来就是进程真正的创建过程。上面都是前期准备过程。
 	ret = restore_root_task(root_item);
 clean_cgroup:
 	fini_cgroup();

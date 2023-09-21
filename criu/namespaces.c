@@ -1500,13 +1500,13 @@ static int start_usernsd(void)
 
 	if (!(root_ns_mask & CLONE_NEWUSER))
 		return 0;
-
+	// 创建了一个守护进程执行usernsd函数，sk是与其通信的socket fd
 	sk = start_unix_cred_daemon(&usernsd_pid, usernsd);
 	if (sk < 0) {
 		pr_err("failed to start usernsd\n");
 		return -1;
 	}
-
+	// 安装服务
 	if (install_service_fd(USERNSD_SK, sk) < 0) {
 		kill(usernsd_pid, SIGKILL);
 		waitpid(usernsd_pid, NULL, 0);
