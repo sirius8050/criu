@@ -13,6 +13,7 @@
         "types.h": "c",
         "rseq.h": "c",
         "clone-noasan.h": "c",
-        "cr_options.h": "c"
+        "cr_options.h": "c",
+        "restore.h": "c"
     }
 }

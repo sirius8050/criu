@@ -120,6 +120,9 @@ enum criu_mode {
 	CR_CPUINFO,
 	CR_EXEC_DEPRECATED,
 	CR_SHOW_DEPRECATED,
+	
+	CR_ZD_DUMP,
+	CR_ZD_RESTORE
 };
 
 struct cr_options {

@@ -102,6 +102,10 @@ static int parse_criu_mode(char *mode)
 		opts.mode = CR_EXEC_DEPRECATED;
 	else if (!strcmp(mode, "show"))
 		opts.mode = CR_SHOW_DEPRECATED;
+	else if (!strcmp(mode, "zd-dump"))
+		opts.mode = CR_ZD_DUMP;
+	else if (!strcmp(mode, "zd-restore"))
+		opts.mode = CR_ZD_RESTORE;
 	else
 		return -1;
 
@@ -282,6 +286,13 @@ int main(int argc, char *argv[], char *envp[])
 	if (opts.img_parent)
 		pr_info("Will do snapshot from %s\n", opts.img_parent);
 
+	if (opts.mode == CR_ZD_DUMP) {
+		if (!opts.tree_id)
+			goto opt_pid_missing;
+
+		return cr_zd_dump_tasks(opts.tree_id);
+	}
+
 	if (opts.mode == CR_DUMP) {
 		if (!opts.tree_id)
 			goto opt_pid_missing;
@@ -306,6 +317,21 @@ int main(int argc, char *argv[], char *envp[])
 			pr_warn("Using -t with criu restore is obsoleted\n");
 
 		ret = cr_restore_tasks();
+		if (ret == 0 && opts.exec_cmd) {
+			close_pid_proc();
+			execvp(opts.exec_cmd[0], opts.exec_cmd);
+			pr_perror("Failed to exec command %s", opts.exec_cmd[0]);
+			ret = 1;
+		}
+
+		return ret != 0;
+	}
+
+		if (opts.mode == CR_ZD_RESTORE) {
+		if (opts.tree_id)
+			pr_warn("Using -t with criu restore is obsoleted\n");
+
+		ret = cr_zd_restore_tasks();
 		if (ret == 0 && opts.exec_cmd) {
 			close_pid_proc();
 			execvp(opts.exec_cmd[0], opts.exec_cmd);
