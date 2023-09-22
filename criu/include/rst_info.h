@@ -10,7 +10,9 @@
 
 struct task_entries {
 	int nr_threads, nr_tasks, nr_helpers;
+	// nr_in_progress用来记录需要完成的任务数量
 	futex_t nr_in_progress;
+	// strart用来记录当前开始的stage
 	futex_t start;
 	atomic_t cr_err;
 	mutex_t userns_sync_lock;

@@ -103,6 +103,8 @@ static inline void futex_dec_and_wake(futex_t *f)
 }
 
 /* Increment futex @f value and wake up all waiters */
+// 为什么设计inc or dec之后直接wake全部进程，启动全部进程之后，这些进程自己会继续判断是否满足条件，如果不满足条件
+// 可能还会继续进入睡眠状态。这样就更简单的设计锁。
 static inline void futex_inc_and_wake(futex_t *f)
 {
 	atomic_inc(&f->raw);

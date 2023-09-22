@@ -1879,7 +1879,7 @@ static int restore_task_with_children(void *_arg)
 
 		if (prepare_namespace(current, ca->clone_flags))
 			goto err;
-
+		// 进入CR_STATE_FORKING状态
 		if (restore_finish_ns_stage(CR_STATE_PREPARE_NAMESPACES, CR_STATE_FORKING) < 0)
 			goto err;
 
@@ -1940,6 +1940,7 @@ static int restore_task_with_children(void *_arg)
 		if (restore_wait_other_tasks())
 			goto err;
 		fini_restore_mntns();
+		// 等待当前阶段所有任务结束，进入CR_STATE_RESTORE阶段
 		__restore_switch_stage(CR_STATE_RESTORE);
 	} else {
 		if (restore_finish_stage(task_entries, CR_STATE_FORKING) < 0)
@@ -2272,7 +2273,8 @@ static int restore_root_task(struct pstree_item *init)
 	// 准备好所有进程所处的namespace信息，调用run_script创建对应的ns
 	if (prepare_namespace_before_tasks())
 		return -1;
-
+	// 当创建一个新的PID namespace时会检测init进程的PID是不是1之类的，并且有后续判断和处理。
+	// 在当前基础实验中可以没有，后期需要考虑。
 	if (vpid(init) == INIT_PID) {
 		if (!(root_ns_mask & CLONE_NEWPID)) {
 			pr_err("This process tree can only be restored "
@@ -2294,13 +2296,15 @@ static int restore_root_task(struct pstree_item *init)
 			return -1;
 		}
 	}
-
+	// 调整运行阶段，可以理解为一个状态机。当运行到不同阶段，criu的部分参数会发生变化。
+	// 比如此时任务数量为1，但是若在子进程restore过程中，任务数量就为子进程数量，只有
+	// 当所有子进程都resotre完毕，检测锁数量才会通过。
 	__restore_switch_stage_nw(CR_STATE_ROOT_TASK);
-
+	// 创建子进程，每个子进程用来restore一个src机器上的进程，子进程组成一个pstree
 	ret = fork_with_pid(init);
 	if (ret < 0)
 		goto out;
-
+	// 每个子进程会都会将origin loginuid写入到proc中的当前进程的loginuid中，修改进程所属loginuid
 	restore_origin_ns_hook();
 
 	if (rsti(init)->clone_flags & CLONE_PARENT) {
@@ -2316,16 +2320,22 @@ static int restore_root_task(struct pstree_item *init)
 		 * It will in case of e.g. segfault before handling
 		 * the signal.
 		 */
+		// 获得SIGCHLD信号的处理函数，将其传入act。
 		sigaction(SIGCHLD, NULL, &act);
+		// SA_NOCLDSTOP：使父进程在它的子进程暂停或继续运行时不会收到 SIGCHLD 信号，
+		// 取消该标志位表示希望接收到子进程的停止通知。
+		// 修改act的sa_flags，实现上述功能。
 		act.sa_flags &= ~SA_NOCLDSTOP;
+		// 将新的SIGCHLD处理函数设置到信号中去
 		sigaction(SIGCHLD, &act, NULL);
-
+		// PTRACE_SEIZE：附着到目标进程中，但是不会暂停目标进程。
 		if (ptrace(PTRACE_SEIZE, init->pid->real, 0, 0)) {
 			pr_perror("Can't attach to init");
 			goto out_kill;
 		}
 	}
-
+	// 本最简单的benchmark中，在这里会直接跳转到skip_ns_bouncing执行。可能是目前没有使用容器
+	// 所以就没有额外的cgroup、namespace
 	if (!root_ns_mask)
 		goto skip_ns_bouncing;
 
@@ -2375,7 +2385,7 @@ static int restore_root_task(struct pstree_item *init)
 	__restore_switch_stage(CR_STATE_FORKING);
 
 skip_ns_bouncing:
-
+	// 这个锁是用来等待CR_STATE_RESTORE阶段所有任务结束。在此时也就是所有任务都装载完毕
 	ret = restore_wait_inprogress_tasks();
 	if (ret < 0)
 		goto out_kill;
@@ -2393,7 +2403,7 @@ skip_ns_bouncing:
 		if (item->pid->state == TASK_DEAD)
 			task_entries->nr_threads--;
 	}
-
+	// 调整为CR_STATE_RESTORE_SIGCHLD阶段，此时任务数量变为子进程个数
 	ret = restore_switch_stage(CR_STATE_RESTORE_SIGCHLD);
 	if (ret < 0)
 		goto out_kill;
@@ -2511,6 +2521,7 @@ skip_ns_bouncing:
 		pr_err("Unable to restore rseq_cs state\n");
 
 	/* Detaches from processes and they continue run through sigreturn. */
+	// 这里是解除所有子进程的ptrace，让所有进程恢复正常执行。
 	if (finalize_restore_detach())
 		goto out_kill_network_unlocked;
 
@@ -3623,6 +3634,7 @@ static int sigreturn_restore(pid_t pid, struct task_restore_args *task_args, uns
 	if (rst_prep_creds(pid, core, &creds_pos))
 		goto err_nv;
 
+	// pstree的root进程会等待其他所有的子进程执行完毕，才会从这里开始运行
 	if (current->parent == NULL) {
 		/* Wait when all tasks restored all files */
 		if (restore_wait_other_tasks())
