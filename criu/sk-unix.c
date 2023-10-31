@@ -152,6 +152,7 @@ static int can_dump_unix_sk(const struct unix_sk_desc *sk)
 	 * that is connected to cr_service. We will dump
 	 * it properly below.
 	 */
+	// 只支持SOCK_STREAM、SOCK_DGRAM、SOCK_SEQPACKET这三种unix socket
 	if (sk->type != SOCK_STREAM && sk->type != SOCK_DGRAM && sk->type != SOCK_SEQPACKET) {
 		pr_err("Unsupported type (%d) on socket %d.\n"
 		       "Only stream/dgram/seqpacket are supported.\n",
@@ -339,7 +340,7 @@ static int dump_one_unix_fd(int lfd, uint32_t id, const struct fd_parms *p)
 	skopts = xptr_pull(&m, SkOptsEntry);
 	perms = xptr_pull(&m, FilePermsEntry);
 	fown = xptr_pull(&m, FownEntry);
-
+	// 声明并且初始化各结构
 	unix_sk_entry__init(ue);
 	sk_opts_entry__init(skopts);
 	file_perms_entry__init(perms);

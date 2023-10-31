@@ -18,25 +18,16 @@
         {
             "name": "Linux",
             "includePath": [
-                "/Users/zhuxianzhi/Desktop/OpenSourceProject/criu/**"
+                "${workspaceFolder}/**"
             ],
             "defines": [],
             "macFrameworkPath": [
                 "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks"
             ],
             "compilerPath": "/usr/bin/clang",
-            "cStandard": "c99",
+            "cStandard": "c17",
             "cppStandard": "c++17",
-            "intelliSenseMode": "macos-clang-arm64",
-            "compilerPathInCppPropertiesJson": "/usr/bin/clang",
-            "mergeConfigurations": false,
-            "browse": {
-                "path": [
-                    "/Users/zhuxianzhi/Desktop/OpenSourceProject/criu/**",
-                    "${workspaceFolder}"
-                ],
-                "limitSymbolsToIncludedHeaders": true
-            }
+            "intelliSenseMode": "macos-clang-arm64"
         }
     ],
     "version": 4

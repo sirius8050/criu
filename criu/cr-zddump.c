@@ -87,7 +87,39 @@
 #include "apparmor.h"
 #include "asm/dump.h"
 
-int cr_zd_dump_tasks(){
-    pr_warn("新建")
+
+int cr_zd_dump_tasks(pid_t pid){
+    // InventoryEntry类型是在images文件夹中的inventory.proto文件中被定义，目前的代码里面是找不到相关的定义。
+    // 在进行编译时，会生成相应的pb.c和pb.h文件，这个时候才会出现相应的定义。
+    // InventoryEntry he = INVENTORY_ENTRY__INIT;
+	// InventoryEntry *parent_ie = NULL;
+	// struct pstree_item *item;
+	// int pre_dump_ret = 0;
+	// int ret = -1;
+
+    // pr_info("========================================\n");
+	// pr_info("Dumping processes (pid: %d comm: %s)\n", pid, __task_comm_info(pid));
+	// pr_info("========================================\n");
+    // // 扩大获取的文件描述符的数量上限。
+    // rlimit_unlimit_nofile();
+
+    // // pstree initialization and return a point to the root of pstree
+    // root_item = alloc_pstree_item();
+    // if (!root_item)
+    //     goto err;
+    // root_item->pid->real = pid;
+    
+    // if (pre_dump_ret != 0){
+    //     pr_err("Pre dump script failed with %d!\n", pre_dump_ret);
+    // }
+
+
+
+
+
+
+
+// err:
+//     return -1;
     return 0;
 }

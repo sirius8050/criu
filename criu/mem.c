@@ -540,9 +540,11 @@ static int __parasite_dump_pages_seized(struct pstree_item *item, struct parasit
 	if (mdc->pre_dump && opts.pre_dump_mode == PRE_DUMP_READ)
 		ret = 0;
 	else
+		// Step 2
 		ret = drain_pages(pp, ctl, args);
 
 	if (!ret && !mdc->pre_dump)
+		// Step 3
 		ret = xfer_pages(pp, &xfer);
 	if (ret)
 		goto out_xfer;

@@ -34,6 +34,7 @@
 #include "file-ids.h"
 #include "kcmp-ids.h"
 #include "common/compiler.h"
+#include "common/asm/atomic.h"
 #include "crtools.h"
 #include "cr_options.h"
 #include "servicefd.h"
@@ -1568,7 +1569,7 @@ static int dump_one_task(struct pstree_item *item, InventoryEntry *parent_ie)
 		dfds = xmalloc(sizeof(*dfds));
 		if (!dfds)
 			goto err;
-
+		// 收集一个进程的fd
 		ret = collect_fds(pid, &dfds);
 		if (ret) {
 			pr_err("Collect fds (pid: %d) failed with %d\n", pid, ret);
@@ -1685,7 +1686,7 @@ static int dump_one_task(struct pstree_item *item, InventoryEntry *parent_ie)
 	mdc.lazy = opts.lazy_pages;
 	mdc.stat = &pps_buf;
 	mdc.parent_ie = parent_ie;
-
+	// 每个进程中耗时最长的操作，Dumping pages
 	ret = parasite_dump_pages_seized(item, &vmas, &mdc, parasite_ctl);
 	if (ret)
 		goto err_cure;
@@ -2111,6 +2112,9 @@ int cr_dump_tasks(pid_t pid)
 	int pre_dump_ret = 0;
 	int ret = -1;
 
+	atomic_t dump_num;
+	int item_num=0;
+
 	pr_info("========================================\n");
 	pr_info("Dumping processes (pid: %d comm: %s)\n", pid, __task_comm_info(pid));
 	pr_info("========================================\n");
@@ -2206,20 +2210,26 @@ int cr_dump_tasks(pid_t pid)
 	if (collect_and_suspend_lsm() < 0)
 		goto err;
 
-	// 继续所有进程的执行
-	for_each_pstree_item(item){
-		ptrace(PTRACE_CONT, item->pid->real, NULL, NULL);
-	}
-
+	// 这里需要将串行改为并行，应该没啥问题
+	
+	for_each_pstree_item(item) item_num++;
+	// futex_set(dump_item, item_num);
+	
+	atomic_set(&dump_num, 0);
 	for_each_pstree_item(item) {
-		// dump哪个进程就先暂停哪个进程的执行
-		ptrace(PTRACE_INTERRUPT, item->pid->real, NULL, NULL);
-		if (dump_one_task(item, parent_ie))
+		int dump_pid = fork();
+		// 子进程用来进行
+		if(dump_pid == 0){
+			if (dump_one_task(item, parent_ie))
+				goto err;
+			atomic_add(1, &dump_num);
+			exit(0);
+		}else if(dump_pid < 0){
 			goto err;
-		
-		// TODO：这里需要加上在对端机器上进行进程的逐个恢复。
-		
+		}
 	}
+	while (atomic_read(&dump_num) != item_num);
+	
 
 	if (parent_ie) {
 		inventory_entry__free_unpacked(parent_ie, NULL);

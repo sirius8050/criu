@@ -216,6 +216,7 @@ int collect_image(struct collect_image_info *cinfo)
 
 	while (1) {
 		void *obj;
+		// 通用类型的msg格式
 		ProtobufCMessage *msg;
 
 		if (cinfo->priv_size) {

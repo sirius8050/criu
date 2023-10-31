@@ -14,6 +14,10 @@
         "rseq.h": "c",
         "clone-noasan.h": "c",
         "cr_options.h": "c",
-        "restore.h": "c"
+        "restore.h": "c",
+        "iterator": "c",
+        "memory": "c",
+        "bitset": "c",
+        "functional": "c"
     }
 }

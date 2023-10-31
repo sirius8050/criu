@@ -2960,7 +2960,7 @@ static int do_restore_task_net_ns(struct ns_id *nsid, struct pstree_item *curren
 	fd = fdstore_get(nsid->net.nsfd_id);
 	if (fd < 0)
 		return -1;
-
+	// setns将自己设置到新的ns
 	if (setns(fd, CLONE_NEWNET)) {
 		pr_perror("Can't restore netns");
 		close(fd);

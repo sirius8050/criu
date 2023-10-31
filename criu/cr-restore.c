@@ -1911,7 +1911,7 @@ static int restore_task_with_children(void *_arg)
 		goto err;
 
 	timing_start(TIME_FORK);
-
+	// 这里会创建当前进程的所有子进程。
 	if (create_children_and_session())
 		goto err;
 
@@ -2448,6 +2448,7 @@ skip_ns_bouncing:
 		goto out_kill;
 
 	/* Unlock network before disabling repair mode on sockets */
+	// 使用iptables来lock、unlock network
 	network_unlock();
 
 	/*
