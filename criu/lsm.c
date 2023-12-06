@@ -382,7 +382,7 @@ int render_lsm_profile(char *profile, char **val)
 
 	return 0;
 }
-
+//处理命令行中lsm相关
 int lsm_check_opts(void)
 {
 	char *aux;

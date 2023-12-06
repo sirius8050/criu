@@ -2,6 +2,7 @@
 #define __CR_FAULT_INJECTION_H__
 #include <stdbool.h>
 
+//定义的错误类型
 enum faults {
 	FI_NONE = 0,
 	FI_DUMP_EARLY,

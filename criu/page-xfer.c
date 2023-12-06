@@ -1488,7 +1488,8 @@ out:
 	tcp_cork(page_server_sk, true);
 	return 0;
 }
-
+//连接pageserver
+//建立socket使用TCP通过网络通信
 int connect_to_page_server_to_send(void)
 {
 	return connect_to_page_server();

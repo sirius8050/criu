@@ -456,7 +456,9 @@ in:
 	pr_info("... done\n");
 	return 1;
 }
-
+/*为了解决转储inoify和fanotify时出现的需要通过inode和设备去获取文件路径的问题，
+*需要准备irmap(inode reverse map)，但是由于这一过程需要扫描文件系统，非常耗时，所以需要在没有冻结进程之前处理。
+*/
 int irmap_load_cache(void)
 {
 	int ret;

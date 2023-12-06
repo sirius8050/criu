@@ -4,11 +4,12 @@
 
 enum faults fi_strategy;
 
+//故障注入，模拟故障发生，一般用于调试
 int fault_injection_init(void)
 {
 	char *val;
 	int start;
-
+	//通过环境变量设置
 	val = getenv("CRIU_FAULT");
 	if (val == NULL)
 		return 0;

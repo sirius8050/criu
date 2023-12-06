@@ -172,7 +172,85 @@ static void pr_info_ipc_msg_entry(const IpcMsgEntry *msg)
 	pr_ipc_desc_entry(msg->desc);
 	pr_info("qbytes: %-10d qnum: %-10d\n", msg->qbytes, msg->qnum);
 }
+//dump基于消息队列的ipc的消息
+// static int dump_ipc_msg_queue_messages(struct cr_img *img, const IpcMsgEntry *msq, unsigned int msg_nr)
+// {
+// 	struct msgbuf *message = NULL;
+// 	unsigned int msgmax;
+// 	int ret, msg_cnt = 0;
+// 	struct sysctl_req req[] = {
+// 		{ "kernel/msgmax", &msgmax, CTL_U32 },
+// 	};
 
+// 	ret = sysctl_op(req, ARRAY_SIZE(req), CTL_READ, CLONE_NEWIPC);
+// 	if (ret < 0) {
+// 		pr_err("Failed to read max IPC message size\n");
+// 		goto err;
+// 	}
+
+// 	msgmax += sizeof(struct msgbuf);
+// 	message = xmalloc(round_up(msgmax, sizeof(u64)));
+// 	if (message == NULL) {
+// 		pr_err("Failed to allocate memory for IPC message\n");
+// 		return -ENOMEM;
+// 	}
+
+// 	for (msg_cnt = 0; msg_cnt < msg_nr; msg_cnt++) {
+// 		IpcMsg msg = IPC_MSG__INIT;
+// 		size_t rounded;
+
+// 		ret = msgrcv(msq->desc->id, message, msgmax, msg_cnt, IPC_NOWAIT | MSG_COPY);
+// 		if (ret < 0) {
+// 			pr_perror("Failed to copy IPC message");
+// 			goto err;
+// 		}
+
+// 		msg.msize = ret;
+// 		msg.mtype = message->mtype;
+
+// 		pr_info_ipc_msg(msg_cnt, &msg);
+
+// 		ret = pb_write_one(img, &msg, PB_IPCNS_MSG);
+// 		if (ret < 0) {
+// 			pr_err("Failed to write IPC message header\n");
+// 			break;
+// 		}
+
+// 		rounded = round_up(msg.msize, sizeof(u64));
+// 		memzero(((void *)message->mtext + msg.msize), rounded - msg.msize);
+// 		ret = write_img_buf(img, message->mtext, rounded);
+// 		if (ret < 0) {
+// 			pr_err("Failed to write IPC message data\n");
+// 			break;
+// 		}
+// 	}
+// 	ret = 0;
+// err:
+// 	xfree(message);
+// 	return ret;
+// }
+
+// //dump
+// static int dump_ipc_msg_queue(struct cr_img *img, int id, const struct msqid_ds *ds)
+// {
+// 	IpcMsgEntry msg = IPC_MSG_ENTRY__INIT;
+// 	IpcDescEntry desc = IPC_DESC_ENTRY__INIT;
+// 	int ret;
+
+// 	msg.desc = &desc;
+// 	fill_ipc_desc(id, msg.desc, &ds->msg_perm);
+// 	msg.qbytes = ds->msg_qbytes;
+// 	msg.qnum = ds->msg_qnum;
+
+// 	pr_info_ipc_msg_entry(&msg);
+
+// 	ret = pb_write_one(img, &msg, PB_IPCNS_MSG_ENT);
+// 	if (ret < 0) {
+// 		pr_err("Failed to write IPC message queue\n");
+// 		return ret;
+// 	}
+// 	return dump_ipc_msg_queue_messages(img, &msg, ds->msg_qnum);
+// }
 //dump基于消息队列的ipc的消息
 static int dump_ipc_msg_queue_messages(struct cr_img *img, const IpcMsgEntry *msq, unsigned int msg_nr)
 {
@@ -266,6 +344,7 @@ static int dump_ipc_msg(struct cr_img *img)
 	}
 
 	pr_info("IPC message queues: %d\n", info.msgpool);
+	int pid_keep_ipc=fork();
 	for (i = 0, slot = 0; i <= maxid; i++) {
 		struct msqid_ds ds;
 		int id, ret;
@@ -277,7 +356,12 @@ static int dump_ipc_msg(struct cr_img *img)
 			pr_perror("Failed to get stats for IPC message queue");
 			break;
 		}
-		ret = dump_ipc_msg_queue(img, id, &ds);
+		if(pid_keep_ipc==0){
+			ret = dump_ipc_msg_queue(img, id, &ds);
+		}else{
+
+		}
+		
 		if (!ret)
 			slot++;
 	}

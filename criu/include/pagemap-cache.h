@@ -9,7 +9,7 @@
 struct vma_area;
 
 #define PAGEMAP_PFN_OFF(addr) (PAGE_PFN(addr) * sizeof(u64))
-
+//
 typedef struct {
 	pid_t pid;			  /* which process it belongs */
 	unsigned long start;		  /* start of area */

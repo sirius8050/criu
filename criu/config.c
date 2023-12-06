@@ -405,7 +405,7 @@ static int pre_parse(int argc, char **argv, bool *usage_error, bool *no_default_
 
 	return 0;
 }
-
+//初始化命令行选项
 void init_opts(void)
 {
 	memset(&opts, 0, sizeof(opts));

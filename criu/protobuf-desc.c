@@ -110,7 +110,7 @@ struct cr_pb_message_desc cr_pb_descs[PB_MAX];
 		__var.free = PB_FREE_TYPECHECK((__type *)NULL, __name);      \
 		__var.pb_desc = &__name##__descriptor;                       \
 	} while (0)
-
+//?
 void cr_pb_init(void)
 {
 	CR_PB_DESC(IDS, TaskKobjIds, task_kobj_ids);

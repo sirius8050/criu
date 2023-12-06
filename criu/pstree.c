@@ -192,7 +192,7 @@ void free_pstree(struct pstree_item *root_item)
 		item = parent;
 	}
 }
-
+//动态分配pstree item的空间并初始化
 struct pstree_item *__alloc_pstree_item(bool rst)
 {
 	struct pstree_item *item;

@@ -532,7 +532,8 @@ static int is_kdat_vdso_sym_valid(void)
 
 	return true;
 }
-
+//dump前对vdso（Virtual Dynamic Shared Object）初始化
+//vdso允许特定的系统调用在用户态执行，而无需进行执行系统调用，提高执行效率
 int vdso_init_dump(void)
 {
 	if (vdso_parse_maps(PROC_SELF, &vdso_maps)) {

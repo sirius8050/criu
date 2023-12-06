@@ -115,7 +115,7 @@ void free_mappings(struct vm_area_list *vma_area_list)
 
 	vm_area_list_init(vma_area_list);
 }
-
+//收集vma信息，建立vma链表
 int collect_mappings(pid_t pid, struct vm_area_list *vma_area_list, dump_filemap_t dump_file)
 {
 	int ret = -1;
@@ -1793,7 +1793,7 @@ static void alarm_handler(int signo)
 	pr_err("FATAL: Unable to interrupt the current operation\n");
 	BUG();
 }
-
+//设置定时器信号处理
 static int setup_alarm_handler(void)
 {
 	struct sigaction sa = {
@@ -2106,13 +2106,15 @@ static int cr_dump_finish(int ret)
 	return post_dump_ret ?: (ret != 0);
 }
 
-// dump所有进程开始的入口
+/* dump所有进程开始的入口
+*  pid:命令行参数传入的pid，也是pstree的根pid
+*/
 int cr_dump_tasks(pid_t pid)
 {
 	//TODO:InventoryEntry是什么
 	InventoryEntry he = INVENTORY_ENTRY__INIT;
 	InventoryEntry *parent_ie = NULL;
-	struct pstree_item *item;//root item?
+	struct pstree_item *item;//root item
 	int pre_dump_ret = 0;
 	int ret = -1;
 
@@ -2130,9 +2132,9 @@ int cr_dump_tasks(pid_t pid)
 	root_item = alloc_pstree_item();
 	if (!root_item)
 		goto err;
-	root_item->pid->real = pid;
+	root_item->pid->real = pid;//设置根pid
 
-	pre_dump_ret = run_scripts(ACT_PRE_DUMP);//pre dump?
+	pre_dump_ret = run_scripts(ACT_PRE_DUMP);//运行pre dump
 	if (pre_dump_ret != 0) {
 		pr_err("Pre dump script failed with %d!\n", pre_dump_ret);
 		goto err;
@@ -2149,7 +2151,7 @@ int cr_dump_tasks(pid_t pid)
 
 	if (irmap_load_cache())
 		goto err;
-
+	//获取CPu信息？
 	if (cpu_init())
 		goto err;
 

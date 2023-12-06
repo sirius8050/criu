@@ -299,7 +299,7 @@ static void soccr_print_on_level(unsigned int loglevel, const char *format, ...)
 	vprint_on_level(lv, format, args);
 	va_end(args);
 }
-
+//设置日志等级
 void log_set_loglevel(unsigned int level)
 {
 	current_loglevel = level;

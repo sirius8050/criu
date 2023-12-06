@@ -121,7 +121,7 @@ enum criu_mode {
 	CR_EXEC_DEPRECATED,
 	CR_SHOW_DEPRECATED,
 };
-
+//保存命令行的选项
 struct cr_options {
 	int final_state;
 	int check_extra_features;

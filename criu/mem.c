@@ -444,7 +444,7 @@ again:
 
 	return ret;
 }
-
+//key
 static int __parasite_dump_pages_seized(struct pstree_item *item, struct parasite_dump_pages_args *args,
 					struct vm_area_list *vma_area_list, struct mem_dump_ctl *mdc,
 					struct parasite_ctl *ctl)
@@ -570,7 +570,7 @@ out:
 	pr_info("----------------------------------------\n");
 	return exit_code;
 }
-
+//关键：获取需要dump的page
 int parasite_dump_pages_seized(struct pstree_item *item, struct vm_area_list *vma_area_list, struct mem_dump_ctl *mdc,
 			       struct parasite_ctl *ctl)
 {

@@ -75,7 +75,7 @@ static int image_dir_mode(char *argv[], int optind)
 	BUG();
 	return -1;
 }
-
+//解析模式，也就是第二个参数
 static int parse_criu_mode(char *mode)
 {
 	if (!strcmp(mode, "dump"))

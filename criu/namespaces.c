@@ -1140,7 +1140,7 @@ int dump_namespaces(struct pstree_item *item, unsigned int ns_flags)
 		case CLONE_NEWCGROUP:
 			continue;
 		}
-
+		//多进程dump namespace
 		pid = fork();
 		if (pid < 0) {
 			pr_perror("Can't fork ns dumper");

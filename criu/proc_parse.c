@@ -865,7 +865,7 @@ err_n:
 	xfree(vma_area);
 	return ret;
 }
-
+//获取进程的相关状态
 int parse_pid_stat(pid_t pid, struct proc_pid_stat *s)
 {
 	char *tok, *p;

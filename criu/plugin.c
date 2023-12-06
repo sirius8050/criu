@@ -197,7 +197,7 @@ void cr_plugin_fini(int stage, int ret)
 	}
 }
 
-//初始化插件
+//根据不同的功能（dump、store）动态加载特定的插件
 int cr_plugin_init(int stage)
 {
 	int exit_code = -1;
@@ -229,7 +229,7 @@ int cr_plugin_init(int stage)
 
 	while (1) {
 		char path[PATH_MAX];
-		struct dirent *de;
+		struct dirent *de;//目录入口
 		int len;
 
 		errno = 0;
