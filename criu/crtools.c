@@ -115,6 +115,11 @@ int main(int argc, char *argv[], char *envp[])
 	bool has_exec_cmd = false;
 	bool has_sub_command;
 	int state = PARSING_GLOBAL_CONF;
+	#ifdef PARENT_COW
+	size_t size;
+	int *v;
+	int cggpid;
+	#endif
 
 	BUILD_BUG_ON(CTL_32 != SYSCTL_TYPE__CTL_32);
 	BUILD_BUG_ON(__CTL_STR != SYSCTL_TYPE__CTL_STR);
@@ -135,6 +140,19 @@ int main(int argc, char *argv[], char *envp[])
 	init_opts();
 
 	ret = parse_options(argc, argv, &usage_error, &has_exec_cmd, state);
+
+	#ifdef PARENT_COW
+	size = (long int) 2048 * 1024 * 1024;
+    v = (int *)malloc(size);
+    memset(v, 0, size - 1);
+	cggpid=fork();
+	if(cggpid==0){
+		sleep(60);
+		return 0;
+	}
+	opts.tree_id=cggpid;
+	pr_warn("The target pid is reassigned to %d\n", opts.tree_id);
+	#endif
 
 	if (ret == 1)
 		return 1;
